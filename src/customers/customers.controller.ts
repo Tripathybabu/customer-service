@@ -1,7 +1,8 @@
-import { Controller, Get, Post, Body, Param, Put, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Put, Delete, ParseIntPipe } from '@nestjs/common';
 import { EventPattern, Payload } from '@nestjs/microservices';
 import { CustomersService } from './customers.service';
 import { Customer } from './customer.entity';
+import { CreateCustomerDto } from './dto/create-customer.dto';
 
 @Controller('customers')
 export class CustomersController {
@@ -14,8 +15,8 @@ export class CustomersController {
   }
 
   @Post()
-  create(@Body() customer: Customer): Promise<Customer> {
-    return this.customersService.create(customer);
+  create(@Body() customer: CreateCustomerDto): Promise<Customer> {
+    return this.customersService.create(customer as unknown as Customer);
   }
 
   @Get()
@@ -24,17 +25,17 @@ export class CustomersController {
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string): Promise<Customer> {
-    return this.customersService.findOne(+id);
+  findOne(@Param('id', ParseIntPipe) id: number): Promise<Customer> {
+    return this.customersService.findOne(id);
   }
 
   @Put(':id')
-  update(@Param('id') id: string, @Body() customer: Customer): Promise<void> {
-    return this.customersService.update(+id, customer);
+  update(@Param('id', ParseIntPipe) id: number, @Body() customer: Partial<Customer>): Promise<void> {
+    return this.customersService.update(id, customer as Customer);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string): Promise<void> {
-    return this.customersService.remove(+id);
+  remove(@Param('id', ParseIntPipe) id: number): Promise<void> {
+    return this.customersService.remove(id);
   }
 }
